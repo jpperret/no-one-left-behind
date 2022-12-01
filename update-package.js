@@ -3,14 +3,14 @@ const fs = require("fs");
 const path = require("path");
 
 function getJSON(URL, cb) {
-  http.get(URL, res => {
+  http.get(URL, (res) => {
     let body = "";
 
-    res.on("data", function(chunk) {
+    res.on("data", function (chunk) {
       body += chunk;
     });
 
-    res.on("end", function() {
+    res.on("end", function () {
       try {
         cb(null, JSON.parse(body));
       } catch (e) {
@@ -20,14 +20,14 @@ function getJSON(URL, cb) {
   });
 }
 
-const scopedPackagePattern = new RegExp('^(?:@([^/]+?)[/])?([^/]+?)$')
+const scopedPackagePattern = new RegExp("^(?:@([^/]+?)[/])?([^/]+?)$");
 function urlFriendly(name) {
   return name === encodeURIComponent(name);
 }
 function validScopedName(name) {
-  const nameMatch = name.match(scopedPackagePattern)
+  const nameMatch = name.match(scopedPackagePattern);
   if (nameMatch) {
-    return urlFriendly(nameMatch[1]) && urlFriendly(nameMatch[1])
+    return urlFriendly(nameMatch[1]) && urlFriendly(nameMatch[1]);
   }
 }
 
