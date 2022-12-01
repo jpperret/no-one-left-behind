@@ -1,30 +1,15 @@
-const http = require("http");
 const fs = require("fs");
 const path = require("path");
+let names = require("all-the-package-names");
 
-function getJSON(URL, cb) {
-  http.get(URL, (res) => {
-    let body = "";
+const groupSize = 1000;
 
-    res.on("data", function (chunk) {
-      body += chunk;
-    });
-
-    res.on("end", function () {
-      try {
-        cb(null, JSON.parse(body));
-      } catch (e) {
-        cb(e);
-      }
-    });
-  });
-}
-
-const scopedPackagePattern = new RegExp("^(?:@([^/]+?)[/])?([^/]+?)$");
 function urlFriendly(name) {
   return name === encodeURIComponent(name);
 }
+
 function validScopedName(name) {
+  const scopedPackagePattern = new RegExp("^(?:@([^/]+?)[/])?([^/]+?)$");
   const nameMatch = name.match(scopedPackagePattern);
   if (nameMatch) {
     return urlFriendly(nameMatch[1]) && urlFriendly(nameMatch[1]);
@@ -33,27 +18,6 @@ function validScopedName(name) {
 
 function validName(name) {
   return name.length > 0 && (urlFriendly(name) || validScopedName(name));
-}
-
-function sanitize(name) {
-  return name.trim(); // validName will filter out anything else that is a problem
-}
-
-function getPackageList(cb) {
-  getJSON(
-    "http://anvaka.github.io/npmrank/online/npmrank.json",
-    (err, json) => {
-      if (err) {
-        return cb(err);
-      }
-
-      if (json && json.rank) {
-        cb(null, Object.keys(json.rank).map(sanitize).filter(validName));
-      } else {
-        cb(new Error("Malformed data"));
-      }
-    }
-  );
 }
 
 function getVersion() {
@@ -67,10 +31,28 @@ function packageEntry(name) {
   return `        "${name}": "latest"`;
 }
 
-function buildJSON(packageList) {
-  // Some packages had to be left behind, to cirumvent
-  // npm ERR! code E400
-  // npm ERR! Too many dependencies. : no-one-left-behind
+function buildGroupJSON(group) {
+  return `
+{
+	"name": "no-one-left-behind-group-${group}",
+	"version": "${getVersion()}",
+	"description": "Every package is invited group",
+	"license": "MIT",
+	"dependencies": {
+${names
+  .slice(group * groupSize, group * groupSize + groupSize)
+  .map(packageEntry)
+  .join(",\n")}
+	}
+}
+	`;
+}
+
+function numToGroupEntry(num) {
+  return `        "no-one-left-behind-group-${num}": "file:groups/no-one-left-behind-group-${num}"`;
+}
+
+function buildMainJSON(numGroups) {
   return `
 {
     "name": "no-one-left-behind",
@@ -83,20 +65,54 @@ function buildJSON(packageList) {
     },
     "license": "MIT",
     "dependencies": {
-${packageList.slice(0, 1000).map(packageEntry).join(",\n")}
+${[...Array(numGroups).keys()].map(numToGroupEntry).join(",\n")}
     }
 }
 `;
 }
 
-getPackageList((err, packageList) => {
-  if (err) {
-    console.log(err);
-    process.exit(1);
-  }
+function createGroupPackage(group) {
+  fs.writeFile(
+    path.join(
+      __dirname,
+      "groups",
+      "no-one-left-behind-group-" + group,
+      "package.json"
+    ),
+    buildGroupJSON(group),
+    () => {}
+  );
+}
 
-  const out = buildJSON(packageList);
+function createMainPackage() {
+  names.filter(validName);
 
-  const file = path.join(__dirname, "package.json");
-  fs.writeFileSync(file, out);
-});
+  fs.mkdir(path.join(__dirname, "groups"), () => {});
+
+  setTimeout(() => {
+    let groupIndex = 0;
+    let packageIndex = 0;
+    while (packageIndex < names.length) {
+      const i = groupIndex;
+      fs.mkdir(
+        path.join(
+          __dirname,
+          "groups",
+          "no-one-left-behind-group-" + groupIndex
+        ),
+        () => createGroupPackage(i + "")
+      );
+      packageIndex += groupSize;
+      groupIndex++;
+    }
+
+    fs.rm(path.join(__dirname, "package.json"), () => {
+      fs.writeFile(
+        path.join(__dirname, "package.json"),
+        buildMainJSON(groupIndex),
+        () => {}
+      );
+    });
+  }, 0);
+}
+createMainPackage();
