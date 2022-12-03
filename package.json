@@ -10,8 +10,8 @@
     },
     "license": "MIT",
     "dependencies": {
-        "no-one-left-behind-agg-0": "file:groups/no-one-left-behind-agg-0",
-        "no-one-left-behind-agg-1": "file:groups/no-one-left-behind-agg-1",
-        "no-one-left-behind-agg-2": "file:groups/no-one-left-behind-agg-2"
+        "no-one-left-behind-agg-0": "file:no-one-left-behind-agg-0",
+        "no-one-left-behind-agg-1": "file:no-one-left-behind-agg-1",
+        "no-one-left-behind-agg-2": "file:no-one-left-behind-agg-2"
     }
 }

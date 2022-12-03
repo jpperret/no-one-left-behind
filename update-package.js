@@ -21,7 +21,7 @@ function getGroupJSON(group) {
 	"dependencies": {
 ${allPackageNames
   .slice(group * groupSize, group * groupSize + groupSize)
-  .map((name) => `        "${name}": "latest"`)
+  .map((name) => `        "${name}": ""`) // most recent version of each package
   .join(",\n")}
 	}
 }
@@ -31,7 +31,7 @@ ${allPackageNames
 function getAggJSON(aggNum) {
   function numToGroupEntry(num) {
     // helper function for main package.json
-    return `        "no-one-left-behind-group-${num}": "file:groups/no-one-left-behind-group-${num}"`;
+    return `        "no-one-left-behind-group-${num}": "file:no-one-left-behind-group-${num}"`;
   }
 
   return `
@@ -41,7 +41,7 @@ function getAggJSON(aggNum) {
 	"description": "Every package is invited",
 	"license": "MIT",
 	"dependencies": {
-${[...Array(1000).keys()]
+${[...Array(groupSize).keys()]
   .map((groupIndex) => (groupIndex += aggNum * groupSize))
   .map(numToGroupEntry)
   .join(",\n")}
@@ -53,7 +53,7 @@ ${[...Array(1000).keys()]
 function getMainJSON(numAggs) {
   function numToAggEntry(num) {
     // helper function for main package.json
-    return `        "no-one-left-behind-agg-${num}": "file:groups/no-one-left-behind-agg-${num}"`;
+    return `        "no-one-left-behind-agg-${num}": "file:no-one-left-behind-agg-${num}"`;
   }
 
   return `
@@ -74,16 +74,22 @@ ${[...Array(numAggs).keys()].map(numToAggEntry).join(",\n")}
 `;
 }
 
-function createGroupPackage(groupNum) {
+function createGroupPackage(aggNum, groupNum) {
   fs.mkdir(
-    path.join(__dirname, "groups", "no-one-left-behind-group-" + groupNum),
+    path.join(
+      __dirname,
+      "node_modules",
+      "no-one-left-behind-agg-" + aggNum,
+      "no-one-left-behind-group-" + groupNum
+    ),
     () => {}
   );
 
   fs.writeFile(
     path.join(
       __dirname,
-      "groups",
+      "node_modules",
+      "no-one-left-behind-agg-" + aggNum,
       "no-one-left-behind-group-" + groupNum,
       "package.json"
     ),
@@ -93,15 +99,19 @@ function createGroupPackage(groupNum) {
 }
 
 function createAggPackage(aggNum) {
+  fs.mkdir(
+    path.join(__dirname, "node_modules", "no-one-left-behind-agg-" + aggNum),
+    () => {}
+  );
   // create groups
   for (let i = 0; i < groupSize; i++) {
-    createGroupPackage(aggNum * groupSize + i);
+    createGroupPackage(aggNum, aggNum * groupSize + i);
   }
 
   fs.writeFile(
     path.join(
       __dirname,
-      "groups",
+      "node_modules",
       "no-one-left-behind-agg-" + aggNum,
       "package.json"
     ),
@@ -114,7 +124,7 @@ function createMainPackage() {
   // TODO any package name filtering?
 
   // create directory to store groups
-  fs.mkdir(path.join(__dirname, "groups"), () => {});
+  fs.mkdir(path.join(__dirname, "node_modules"), () => {});
 
   setTimeout(() => {
     let aggIndex = 0;
@@ -123,7 +133,11 @@ function createMainPackage() {
       const i = aggIndex;
       // create folder then create package.json for each group
       fs.mkdir(
-        path.join(__dirname, "groups", "no-one-left-behind-agg-" + aggIndex),
+        path.join(
+          __dirname,
+          "node_modules",
+          "no-one-left-behind-agg-" + aggIndex
+        ),
         () => createAggPackage(i + "")
       );
       packageIndex += groupSize * groupSize; // groupSize groups with groupSize packages in each agg group
@@ -142,3 +156,4 @@ function createMainPackage() {
 }
 
 createMainPackage();
+// TODO could add check to search through all folders and make sure all got created and include a package lock
