@@ -1,24 +1,8 @@
 const fs = require("fs");
 const path = require("path");
-let names = require("all-the-package-names");
+let allPackageNames = require("all-the-package-names");
 
 const groupSize = 1000;
-
-function urlFriendly(name) {
-  return name === encodeURIComponent(name);
-}
-
-function validScopedName(name) {
-  const scopedPackagePattern = new RegExp("^(?:@([^/]+?)[/])?([^/]+?)$");
-  const nameMatch = name.match(scopedPackagePattern);
-  if (nameMatch) {
-    return urlFriendly(nameMatch[1]) && urlFriendly(nameMatch[1]);
-  }
-}
-
-function validName(name) {
-  return name.length > 0 && (urlFriendly(name) || validScopedName(name));
-}
 
 function getVersion() {
   const date = new Date();
@@ -27,11 +11,7 @@ function getVersion() {
   return `${date.getFullYear()}.${monthS}.${dayS}`;
 }
 
-function packageEntry(name) {
-  return `        "${name}": "latest"`;
-}
-
-function buildGroupJSON(group) {
+function getGroupJSON(group) {
   return `
 {
 	"name": "no-one-left-behind-group-${group}",
@@ -39,20 +19,43 @@ function buildGroupJSON(group) {
 	"description": "Every package is invited group",
 	"license": "MIT",
 	"dependencies": {
-${names
+${allPackageNames
   .slice(group * groupSize, group * groupSize + groupSize)
-  .map(packageEntry)
+  .map((name) => `        "${name}": "latest"`)
   .join(",\n")}
 	}
 }
-	`;
+`;
 }
 
-function numToGroupEntry(num) {
-  return `        "no-one-left-behind-group-${num}": "file:groups/no-one-left-behind-group-${num}"`;
+function getAggJSON(aggNum) {
+  function numToGroupEntry(num) {
+    // helper function for main package.json
+    return `        "no-one-left-behind-group-${num}": "file:groups/no-one-left-behind-group-${num}"`;
+  }
+
+  return `
+{
+	"name": "no-one-left-behind-agg-${aggNum}",
+	"version": "${getVersion()}",
+	"description": "Every package is invited",
+	"license": "MIT",
+	"dependencies": {
+${[...Array(1000).keys()]
+  .map((groupIndex) => (groupIndex += aggNum * groupSize))
+  .map(numToGroupEntry)
+  .join(",\n")}
+	}
+}
+`;
 }
 
-function buildMainJSON(numGroups) {
+function getMainJSON(numAggs) {
+  function numToAggEntry(num) {
+    // helper function for main package.json
+    return `        "no-one-left-behind-agg-${num}": "file:groups/no-one-left-behind-agg-${num}"`;
+  }
+
   return `
 {
     "name": "no-one-left-behind",
@@ -65,54 +68,77 @@ function buildMainJSON(numGroups) {
     },
     "license": "MIT",
     "dependencies": {
-${[...Array(numGroups).keys()].map(numToGroupEntry).join(",\n")}
+${[...Array(numAggs).keys()].map(numToAggEntry).join(",\n")}
     }
 }
 `;
 }
 
-function createGroupPackage(group) {
+function createGroupPackage(groupNum) {
+  fs.mkdir(
+    path.join(__dirname, "groups", "no-one-left-behind-group-" + groupNum),
+    () => {}
+  );
+
   fs.writeFile(
     path.join(
       __dirname,
       "groups",
-      "no-one-left-behind-group-" + group,
+      "no-one-left-behind-group-" + groupNum,
       "package.json"
     ),
-    buildGroupJSON(group),
+    getGroupJSON(groupNum),
+    () => {}
+  );
+}
+
+function createAggPackage(aggNum) {
+  // create groups
+  for (let i = 0; i < groupSize; i++) {
+    createGroupPackage(aggNum * groupSize + i);
+  }
+
+  fs.writeFile(
+    path.join(
+      __dirname,
+      "groups",
+      "no-one-left-behind-agg-" + aggNum,
+      "package.json"
+    ),
+    getAggJSON(aggNum),
     () => {}
   );
 }
 
 function createMainPackage() {
-  names.filter(validName);
+  // TODO any package name filtering?
 
+  // create directory to store groups
   fs.mkdir(path.join(__dirname, "groups"), () => {});
 
   setTimeout(() => {
-    let groupIndex = 0;
+    let aggIndex = 0;
     let packageIndex = 0;
-    while (packageIndex < names.length) {
-      const i = groupIndex;
+    while (packageIndex < allPackageNames.length) {
+      const i = aggIndex;
+      // create folder then create package.json for each group
       fs.mkdir(
-        path.join(
-          __dirname,
-          "groups",
-          "no-one-left-behind-group-" + groupIndex
-        ),
-        () => createGroupPackage(i + "")
+        path.join(__dirname, "groups", "no-one-left-behind-agg-" + aggIndex),
+        () => createAggPackage(i + "")
       );
-      packageIndex += groupSize;
-      groupIndex++;
+      packageIndex += groupSize * groupSize; // groupSize groups with groupSize packages in each agg group
+      aggIndex++;
     }
 
+    // remove old package.json and write new one
     fs.rm(path.join(__dirname, "package.json"), () => {
       fs.writeFile(
         path.join(__dirname, "package.json"),
-        buildMainJSON(groupIndex),
+        getMainJSON(aggIndex),
         () => {}
       );
     });
   }, 0);
 }
+
 createMainPackage();

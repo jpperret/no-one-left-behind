@@ -1,7 +1,7 @@
 
 {
 	"name": "no-one-left-behind-group-1768",
-	"version": "2022.12.01",
+	"version": "2022.12.03",
 	"description": "Every package is invited group",
 	"license": "MIT",
 	"dependencies": {
@@ -1007,4 +1007,3 @@
         "retyped-promise-tsd-ambient": "latest"
 	}
 }
-	
