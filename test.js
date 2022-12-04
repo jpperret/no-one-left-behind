@@ -57,8 +57,8 @@ function confirmCreated() {
   return allExist;
 }
 
-console.log("file in", __dirname);
-fs.readdirSync(__dirname).forEach((file) => {
+console.log("files in", path.join(__dirname, "node_modules"));
+fs.readdirSync(path.join(__dirname, "node_modules")).forEach((file) => {
   console.log(file);
 });
 
