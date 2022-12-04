@@ -1,23 +1,14 @@
 name: Test File Creation
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   RunTest:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [10.x, 12.x, 14.x, 15.x]
-
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Node test
         uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
+      - run: npm install all-the-package-names
       - run: npm test
