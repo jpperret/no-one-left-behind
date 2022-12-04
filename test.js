@@ -57,6 +57,11 @@ function confirmCreated() {
   return allExist;
 }
 
+console.log("file in", __dirname);
+fs.readdirSync(testFolder).forEach((file) => {
+  console.log(file);
+});
+
 if (!confirmCreated()) {
   throw "All files not created";
 } else {
