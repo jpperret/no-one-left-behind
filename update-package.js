@@ -5,7 +5,6 @@ let allPackageNames = require("all-the-package-names");
 const groupSize = 1000;
 
 function getVersion() {
-  return "2022.12.03"; // Don't change version for now
   const date = new Date();
   const monthS = ("" + (date.getMonth() + 1)).padStart(2, "0");
   const dayS = ("" + date.getDate()).padStart(2, "0");
