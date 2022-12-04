@@ -5,6 +5,7 @@ let allPackageNames = require("all-the-package-names");
 const groupSize = 1000;
 
 function getVersion() {
+  return "2022.12.03"; // Don't change version for now
   const date = new Date();
   const monthS = ("" + (date.getMonth() + 1)).padStart(2, "0");
   const dayS = ("" + date.getDate()).padStart(2, "0");
@@ -41,7 +42,16 @@ function getAggJSON(aggNum) {
 	"description": "Every package is invited",
 	"license": "MIT",
 	"dependencies": {
-${[...Array(groupSize).keys()]
+${[
+  ...Array(
+    aggNum * groupSize * groupSize + groupSize * groupSize <=
+      allPackageNames.length
+      ? groupSize
+      : Math.ceil(
+          (allPackageNames.length - aggNum * groupSize * groupSize) / groupSize
+        )
+  ).keys(),
+]
   .map((groupIndex) => (groupIndex += aggNum * groupSize))
   .map(numToGroupEntry)
   .join(",\n")}
@@ -105,7 +115,11 @@ function createAggPackage(aggNum) {
   );
   // create groups
   for (let i = 0; i < groupSize; i++) {
-    createGroupPackage(aggNum, aggNum * groupSize + i);
+    const groupNum = aggNum * groupSize + i;
+    if (groupNum * groupSize > allPackageNames.length) {
+      break;
+    }
+    createGroupPackage(aggNum, groupNum);
   }
 
   fs.writeFile(
@@ -122,6 +136,9 @@ function createAggPackage(aggNum) {
 
 function createMainPackage() {
   // TODO any package name filtering?
+  console.log(
+    `no-one-left-behind will depend on ${allPackageNames.length} packages`
+  );
 
   // create directory to store groups
   fs.mkdir(path.join(__dirname, "node_modules"), () => {});
@@ -180,6 +197,9 @@ function confirmCreated() {
       groupNum < aggNum * groupSize + groupSize;
       groupNum++
     ) {
+      if (groupNum * groupSize > allPackageNames.length) {
+        break;
+      }
       if (
         !fs.existsSync(
           path.join(
