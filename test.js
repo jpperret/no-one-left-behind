@@ -58,7 +58,7 @@ function confirmCreated() {
 }
 
 console.log("file in", __dirname);
-fs.readdirSync(testFolder).forEach((file) => {
+fs.readdirSync(__dirname).forEach((file) => {
   console.log(file);
 });
 
