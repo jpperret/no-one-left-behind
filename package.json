@@ -6,7 +6,8 @@
     "repository": "Zalastax/no-one-left-behind",
     "scripts": {
         "update-packages": "node update-package.js",
-        "deploy": "node deploy.js"
+        "deploy": "node deploy.js",
+		"test": "node test.js"
     },
     "license": "MIT",
     "dependencies": {
