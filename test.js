@@ -83,6 +83,8 @@ console.log(
   )
 );
 
+console.log("current", __dirname);
+
 console.log(
   fs.existsSync(
     path.join(
