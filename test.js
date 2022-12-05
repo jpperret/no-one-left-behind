@@ -84,7 +84,7 @@ console.log(
 );
 
 console.log(
-  fs.fileExists(
+  fs.existsSync(
     path.join(
       fs.readlinkSync(
         path.join(__dirname, "node_modules", "no-one-left-behind-agg-0")
