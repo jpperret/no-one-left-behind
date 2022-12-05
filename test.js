@@ -58,8 +58,10 @@ function confirmCreated() {
 }
 
 console.log("files in", path.join(__dirname, "node_modules"));
-fs.readdirSync(path.join(__dirname, "node_modules")).forEach((file) => {
-  console.log(file);
+fs.readdirSync(path.join(__dirname, "node_modules"), {
+  withFileTypes: true,
+}).forEach((file) => {
+  console.log(file, file.isDirectory());
 });
 console.log(
   "files in",
