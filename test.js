@@ -80,6 +80,16 @@ console.table(res);
 fs.lstat(
   path.join(__dirname, "node_modules", "no-one-left-behind-agg-0"),
   (err, stats) => {
+    console.log(0);
+    console.log(err);
+    console.log(stats);
+  }
+);
+
+fs.lstat(
+  path.join(__dirname, "node_modules", "no-one-left-behind-agg-5"),
+  (err, stats) => {
+    console.log(5);
     console.log(err);
     console.log(stats);
   }
