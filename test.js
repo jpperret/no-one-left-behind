@@ -85,6 +85,8 @@ fs.lstat(
   }
 );
 
+/*
+
 console.log(
   "files in",
   path.join(__dirname, "node_modules", "no-one-left-behind-agg-0")
@@ -100,3 +102,4 @@ if (!confirmCreated()) {
 } else {
   console.log("All package.json files created as expected");
 }
+*/
