@@ -67,23 +67,25 @@ if (!confirmCreated()) {
 console.log(
   "agg0 package" +
     fs.lstatSync(
-      path.join(
-        __dirname,
-        "node_modules",
-        "no-one-left-behind-agg-0",
-        "package.json"
-      ),
+      path.join(__dirname, "no-one-left-behind-agg-0", "package.json"),
       { throwIfNoEntry: false }
     )
 );
 
 console.log(
-  fs.readlinkSync(
+  "realpath",
+  fs.realpathSync(
     path.join(__dirname, "node_modules", "no-one-left-behind-agg-0")
   )
 );
 
 console.log("current", __dirname);
+
+console.log(
+  fs.existsSync(
+    "/home/runner/work/no-one-left-behind/no-one-left-behind/node_modules/"
+  )
+);
 
 console.log(
   fs.existsSync(
