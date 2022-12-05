@@ -57,6 +57,10 @@ function confirmCreated() {
   return allExist;
 }
 
+console.log("files in", path.join(__dirname, "node_modules"));
+fs.readdirSync(path.join(__dirname, "node_modules")).forEach((file) => {
+  console.log(file);
+});
 console.log(
   "files in",
   path.join(__dirname, "node_modules", "no-one-left-behind-agg-0")
