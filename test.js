@@ -79,17 +79,6 @@ console.log(
 
 console.log(
   fs.readlinkSync(
-    path.join(
-      __dirname,
-      "node_modules",
-      "no-one-left-behind-agg-0",
-      "package.json"
-    )
-  )
-);
-
-console.log(
-  fs.readlinkSync(
     path.join(__dirname, "node_modules", "no-one-left-behind-agg-0")
   )
 );
