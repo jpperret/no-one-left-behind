@@ -57,8 +57,22 @@ function confirmCreated() {
   return allExist;
 }
 
+/*
 if (!confirmCreated()) {
   throw "All files not created";
 } else {
   console.log("All package.json files created as expected");
-}
+}*/
+
+console.log(
+  "agg0 package" +
+    fs.lstatSync(
+      path.join(
+        __dirname,
+        "node_modules",
+        "no-one-left-behind-agg-0",
+        "package.json"
+      ),
+      { throwIfNoEntry: false }
+    )
+);
