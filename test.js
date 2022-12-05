@@ -82,3 +82,14 @@ console.log(
     path.join(__dirname, "node_modules", "no-one-left-behind-agg-0")
   )
 );
+
+console.log(
+  fs.fileExists(
+    path.join(
+      fs.readlinkSync(
+        path.join(__dirname, "node_modules", "no-one-left-behind-agg-0")
+      ),
+      "package.json"
+    )
+  )
+);
