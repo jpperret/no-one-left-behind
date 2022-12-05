@@ -1,6 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 let allPackageNames = require("all-the-package-names");
+module.exports = { confirmCreated };
+
 const groupSize = 1000;
 
 function confirmCreated() {

@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 let allPackageNames = require("all-the-package-names");
+const tests = require("./test");
 
 const groupSize = 1000;
 
@@ -73,7 +74,8 @@ function getMainJSON(numAggs) {
     "repository": "Zalastax/no-one-left-behind",
     "scripts": {
         "update-packages": "node update-package.js",
-        "deploy": "node deploy.js"
+        "deploy": "node deploy.js",
+		"test": "node test.js"
     },
     "license": "MIT",
     "dependencies": {
@@ -172,3 +174,8 @@ function createMainPackage() {
 }
 
 createMainPackage();
+if (!tests.confirmCreated()) {
+  throw "All files not created";
+} else {
+  console.log("All package.json files created as expected");
+}
