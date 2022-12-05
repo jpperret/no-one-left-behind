@@ -58,11 +58,25 @@ function confirmCreated() {
 }
 
 console.log("files in", path.join(__dirname, "node_modules"));
-fs.readdirSync(path.join(__dirname, "node_modules"), {
-  withFileTypes: true,
-}).forEach((file) => {
-  console.log(file, file.isDirectory());
-});
+var methods = [
+  "isBlockDevice",
+  "isCharacterDevice",
+  "isDirectory",
+  "isFIFO",
+  "isFile",
+  "isSocket",
+  "isSymbolicLink",
+];
+var res = fs
+  .readdirSync(path.join(__dirname, "node_modules"), { withFileTypes: true })
+  .map((d) => {
+    var cur = { name: d.name };
+    for (var method of methods) cur[method] = d[method]();
+    return cur;
+  });
+
+console.table(res);
+
 console.log(
   "files in",
   path.join(__dirname, "node_modules", "no-one-left-behind-agg-0")
