@@ -8,15 +8,15 @@ function confirmCreated() {
   let allExist = true;
   const numAggs = allPackageNames.length / groupSize / groupSize;
   for (let aggNum = 0; aggNum < numAggs; aggNum++) {
+    const aggFilePath = path.join(
+      __dirname,
+      "node_modules",
+      "no-one-left-behind-agg-" + aggNum,
+      "package.json"
+    );
     if (
-      !fs.existsSync(
-        path.join(
-          __dirname,
-          "node_modules",
-          "no-one-left-behind-agg-" + aggNum,
-          "package.json"
-        )
-      )
+      !fs.existsSync(aggFilePath) &&
+      fs.lstatSync(aggFilePath, { throwIfNoEntry: false }) == undefined
     ) {
       console.log(
         "No file " + "no-one-left-behind-agg-" + aggNum + "/package.json"
@@ -31,16 +31,16 @@ function confirmCreated() {
       if (groupNum * groupSize > allPackageNames.length) {
         break;
       }
+      const groupFilePath = path.join(
+        __dirname,
+        "node_modules",
+        "no-one-left-behind-agg-" + aggNum,
+        "no-one-left-behind-group-" + groupNum,
+        "package.json"
+      );
       if (
-        !fs.existsSync(
-          path.join(
-            __dirname,
-            "node_modules",
-            "no-one-left-behind-agg-" + aggNum,
-            "no-one-left-behind-group-" + groupNum,
-            "package.json"
-          )
-        )
+        !fs.existsSync(groupFilePath) &&
+        fs.lstatSync(groupFilePath, { throwIfNoEntry: false }) == undefined
       ) {
         console.log(
           "No file " +
@@ -57,59 +57,8 @@ function confirmCreated() {
   return allExist;
 }
 
-console.log("files in", path.join(__dirname, "node_modules"));
-var methods = [
-  "isBlockDevice",
-  "isCharacterDevice",
-  "isDirectory",
-  "isFIFO",
-  "isFile",
-  "isSocket",
-  "isSymbolicLink",
-];
-var res = fs
-  .readdirSync(path.join(__dirname, "node_modules"), { withFileTypes: true })
-  .map((d) => {
-    var cur = { name: d.name };
-    for (var method of methods) cur[method] = d[method]();
-    return cur;
-  });
-
-console.table(res);
-
-fs.lstat(
-  path.join(__dirname, "node_modules", "no-one-left-behind-agg-0"),
-  (err, stats) => {
-    console.log(0);
-    console.log(err);
-    console.log(stats);
-  }
-);
-
-fs.lstat(
-  path.join(__dirname, "node_modules", "no-one-left-behind-agg-5"),
-  (err, stats) => {
-    console.log(5);
-    console.log(err);
-    console.log(stats);
-  }
-);
-
-/*
-
-console.log(
-  "files in",
-  path.join(__dirname, "node_modules", "no-one-left-behind-agg-0")
-);
-fs.readdirSync(
-  path.join(__dirname, "node_modules", "no-one-left-behind-agg-0")
-).forEach((file) => {
-  console.log(file);
-});
-
 if (!confirmCreated()) {
   throw "All files not created";
 } else {
   console.log("All package.json files created as expected");
 }
-*/

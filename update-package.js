@@ -74,6 +74,7 @@ function getMainJSON(numAggs) {
     "scripts": {
         "update-packages": "node update-package.js",
         "deploy": "node deploy.js"
+		"test": "node test.js"
     },
     "license": "MIT",
     "dependencies": {
