@@ -65,17 +65,14 @@ if (!confirmCreated()) {
 }*/
 
 console.log(
-  "agg0 package" +
-    fs.lstatSync(
-      path.join(__dirname, "no-one-left-behind-agg-0", "package.json"),
-      { throwIfNoEntry: false }
-    )
-);
-
-console.log(
   "realpath",
   fs.realpathSync(
-    path.join(__dirname, "node_modules", "no-one-left-behind-agg-0")
+    path.join(
+      __dirname,
+      "node_modules",
+      "no-one-left-behind-agg-0",
+      "package.json"
+    )
   )
 );
 
